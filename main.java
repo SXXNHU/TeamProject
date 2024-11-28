@@ -1,41 +1,40 @@
-public class Main {
+import java.util.Arrays;
+
+public class main {
     public static void main(String[] args) {
         // 사용자 생성
-        User user = new User(1, "John Doe", 100000);
+        AbstractUser userA = new ConcreteUser(1, "UserA", 1000000);
+        userA.setHighCondition(80000);
+        userA.setLowCondition(60000);
 
-        // 회사 생성 (예: 추상 클래스를 상속받은 CompanyA)
-        CompanyA company = new CompanyA("C001", "CompanyA", 1000);
+        AbstractUser userB = new ConcreteUser(2, "UserB", 1500000);
+        userB.setHighCondition(75000);
+        userB.setLowCondition(65000);
 
-        // 사용자 조건 설정
-        user.setHighCondition(1100); // 매도 상한
-        user.setLowCondition(900);  // 매수 하한
+        // 회사 생성
+        AbstractCompany company1 = new ConcreteCompany("C001", "Samsung Elec.", 77777);
+        AbstractCompany company2 = new ConcreteCompany("C002", "Apple.Corp", 95840);
 
-        // 사용자 정보 출력
-        System.out.println("User Info:");
-        System.out.println("ID: " + user.getUserId());
-        System.out.println("Name: " + user.getName());
-        System.out.println("Money: " + user.getMoney());
+        // 매니저 생성 및 스레드 시작
+        Manager manager = new Manager(Arrays.asList(userA, userB), Arrays.asList(company1, company2));
+        manager.start();
 
-        // 회사 정보 출력
-        System.out.println("\nCompany Info:");
-        System.out.println("Name: " + company.getName());
-        System.out.println("Price: " + company.getPrice());
-
-        // 테스트: 거래 실행
-        AutoHandler autoHandler = new AutoHandler(user, company);
-        for (int i = 0; i < 5; i++) { // 5초 동안 테스트
-            company.updatePrice();  // 회사 주식 가격 변동
-            autoHandler.AutoTrade(); // 자동 매매 실행
-
-            try {
-                Thread.sleep(1000); // 1초 대기
-            } catch (InterruptedException e) {
-                System.out.println("Test interrupted.");
-            }
+        // 10초 후 매니저 스레드 종료
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        manager.stopRunning();
 
-        // 결과 출력
-        System.out.println("\nFinal Trade History:");
-        user.showTradeHistory();
+        // 거래 내역 출력
+        System.out.println("\n--- Trade History ---");
+        for (String record : userA.getTradeHistory()) {
+            System.out.println(record);
+        }
+        System.out.println("------------------------------------------------------------------");
+        for (String record : userB.getTradeHistory()) {
+            System.out.println(record);
+        }
     }
 }
